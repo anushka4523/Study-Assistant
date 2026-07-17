@@ -1,4 +1,6 @@
 import "dotenv/config";
+import path from "path";
+import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
 import { StudySetSchema, semanticIssues } from "./schema.js";
@@ -7,6 +9,8 @@ import { callAnthropic } from "./providers/anthropic.js";
 import { callOpenAICompatible } from "./providers/openaiCompatible.js";
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 8787;
 const PROVIDER = process.env.AI_PROVIDER || "anthropic"; // "anthropic" | "openai"
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -121,6 +125,15 @@ app.post("/api/generate", async (req, res) => {
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, provider: PROVIDER });
+});
+
+const clientDist = path.join(__dirname, "../client/dist");
+
+app.use(express.static(clientDist));
+
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api")) return next();
+  res.sendFile(path.join(clientDist, "index.html"));
 });
 
 app.listen(PORT, () => {
