@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8787";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
 
 /**
  * Posts the user's input to the backend and returns the parsed study set.
